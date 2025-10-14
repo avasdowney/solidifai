@@ -4,20 +4,21 @@ Generate STL files from plain text descriptions using AI.
 
 ## Overview
 
-`solidifai` is a Python application that uses generative AI (OpenAI's GPT models) to create 3D printable STL files from natural language descriptions. Simply describe what you want to create, and solidifai will generate the necessary OpenSCAD code and convert it to an STL file.
+`solidifai` is a Python web application that uses generative AI (AWS Bedrock with Claude) to create 3D printable STL files from natural language descriptions. Simply describe what you want to create through the web interface, and solidifai will generate the necessary OpenSCAD code and convert it to an STL file.
 
 ## Features
 
-- 🤖 **AI-Powered Generation**: Uses OpenAI's GPT-4 to understand natural language descriptions
+- 🤖 **AI-Powered Generation**: Uses AWS Bedrock with Claude to understand natural language descriptions
 - 📐 **OpenSCAD Integration**: Generates parametric OpenSCAD code for precise 3D modeling
 - 🖨️ **STL Export**: Automatically converts to STL format for 3D printing
-- 🎯 **Simple CLI**: Easy-to-use command-line interface
+- � **Web Interface**: Beautiful, responsive web interface for easy usage
 - 💾 **Intermediate Files**: Saves OpenSCAD code for manual tweaking if needed
+- 📁 **File Downloads**: Direct download links for both .scad and .stl files
 
 ## Prerequisites
 
 1. **Python 3.8+**
-2. **OpenAI API Key**: Get one from [OpenAI Platform](https://platform.openai.com/api-keys)
+2. **AWS Account and Credentials**: Configure AWS credentials with access to Bedrock
 3. **OpenSCAD** (optional but recommended): Download from [openscad.org](https://openscad.org/)
    - Without OpenSCAD, the tool will generate `.scad` files that you can open manually
 
@@ -34,65 +35,48 @@ pip install -e .
 
 ## Configuration
 
-Set your OpenAI API key as an environment variable:
+Configure your AWS credentials using one of these methods:
 
+### Option 1: AWS CLI
 ```bash
-export OPENAI_API_KEY='your-api-key-here'
+aws configure
 ```
 
-Or create a `.env` file in the project directory:
-
+### Option 2: Create a `.env` file
 ```
-OPENAI_API_KEY=your-api-key-here
+AWS_ACCESS_KEY_ID=your-access-key
+AWS_SECRET_ACCESS_KEY=your-secret-key
+AWS_DEFAULT_REGION=us-east-1
 ```
 
 ## Usage
 
-### Command Line
+1. **Start the web server:**
+   ```bash
+   python run_web.py
+   ```
 
-Basic usage:
+2. **Open your browser:**
+   Navigate to http://localhost:8000
 
-```bash
-solidifai "a simple cube with 10mm sides" -o cube.stl
-```
+3. **Generate models:**
+   - Enter a description like "a simple cube with 10mm sides"
+   - Optionally select an AWS region
+   - Click "Generate STL File"
+   - Download the generated .scad and .stl files
 
-More examples:
+### Example Descriptions:
+- "a cylinder with diameter 20mm and height 30mm"
+- "a sphere with radius 15mm" 
+- "a gear with 12 teeth, 30mm outer diameter"
+- "an L-shaped bracket with 50mm legs and 5mm thickness"
+- "a phone stand with 60 degree viewing angle"
 
-```bash
-# Create a cylinder
-solidifai "a cylinder with diameter 20mm and height 30mm" -o cylinder.stl
-
-# Create a sphere
-solidifai "a sphere with radius 15mm" -o sphere.stl
-
-# Create something more complex
-solidifai "a gear with 12 teeth, 30mm outer diameter" -o gear.stl
-
-# Create a bracket
-solidifai "an L-shaped bracket with 50mm legs and 5mm thickness" -o bracket.stl
-```
-
-### Python API
-
-You can also use solidifai as a Python library:
-
-```python
-from solidifai import STLGenerator
-
-# Initialize the generator
-generator = STLGenerator(api_key="your-api-key")
-
-# Generate an STL file
-generator.generate(
-    description="a cube with rounded edges, 20mm on each side",
-    output_path="rounded_cube.stl"
-)
-```
 
 ## How It Works
 
 1. **Text Input**: You provide a natural language description of the 3D object
-2. **AI Processing**: OpenAI's GPT-4 interprets your description and generates OpenSCAD code
+2. **AI Processing**: AWS Bedrock with Claude interprets your description and generates OpenSCAD code
 3. **Code Generation**: Valid OpenSCAD code is created with appropriate parameters
 4. **STL Conversion**: The OpenSCAD code is compiled to an STL file (if OpenSCAD is installed)
 5. **Output**: You get both the `.scad` file (editable) and `.stl` file (3D printable)
@@ -107,28 +91,19 @@ For each generation, you'll get:
 ## Examples
 
 ### Simple Shapes
-
-```bash
-solidifai "cube 10mm" -o cube.stl
-solidifai "cylinder height 20mm diameter 10mm" -o cylinder.stl
-solidifai "sphere radius 15mm" -o sphere.stl
-```
+- "cube 10mm"
+- "cylinder height 20mm diameter 10mm"
+- "sphere radius 15mm"
 
 ### Functional Parts
-
-```bash
-solidifai "a phone stand with 60 degree angle" -o phone_stand.stl
-solidifai "a cable organizer with 5 slots" -o cable_organizer.stl
-solidifai "a mounting bracket with screw holes" -o bracket.stl
-```
+- "a phone stand with 60 degree angle"
+- "a cable organizer with 5 slots"
+- "a mounting bracket with screw holes"
 
 ### Creative Objects
-
-```bash
-solidifai "a dice with rounded corners" -o dice.stl
-solidifai "a snowflake ornament" -o snowflake.stl
-solidifai "a vase with hexagonal pattern" -o vase.stl
-```
+- "a dice with rounded corners"
+- "a snowflake ornament"
+- "a vase with hexagonal pattern"
 
 ## Tips for Better Results
 
@@ -145,10 +120,13 @@ If you see this warning, the tool will still generate the `.scad` file. You can:
 - Open the `.scad` file manually in OpenSCAD
 - Export to STL from OpenSCAD's File menu
 
-### "OpenAI API key must be provided"
-Make sure your API key is set:
+### "AWS credentials not found"
+Make sure your AWS credentials are configured:
 ```bash
-export OPENAI_API_KEY='your-key-here'
+aws configure
+# or
+export AWS_ACCESS_KEY_ID='your-access-key'
+export AWS_SECRET_ACCESS_KEY='your-secret-key'
 ```
 
 ### Generated model doesn't look right
@@ -156,24 +134,14 @@ export OPENAI_API_KEY='your-key-here'
 - Try a more detailed or different description
 - The AI might need more specific dimensions or constraints
 
-## Project Structure
-
-```
-solidifai/
-├── solidifai/
-│   ├── __init__.py       # Package initialization
-│   ├── generator.py      # Core STL generation logic
-│   └── cli.py           # Command-line interface
-├── requirements.txt      # Python dependencies
-├── setup.py             # Package setup
-└── README.md            # This file
-```
 
 ## Dependencies
 
-- `openai>=1.0.0` - OpenAI API client
+- `boto3>=1.28.0` - AWS SDK for Python (includes Bedrock client)
 - `python-dotenv>=1.0.0` - Environment variable management
-- `solidpython2>=2.1.0` - Python OpenSCAD library (future use)
+- `fastapi>=0.104.0` - Web framework
+- `uvicorn>=0.24.0` - ASGI server
+- `jinja2>=3.1.0` - Template engine
 
 ## Contributing
 
@@ -188,7 +156,7 @@ This project is open source. Feel free to use and modify as needed.
 
 ## Acknowledgments
 
-- Built with [OpenAI's GPT-4](https://openai.com/)
+- Built with [AWS Bedrock](https://aws.amazon.com/bedrock/) and [Anthropic's Claude](https://www.anthropic.com/)
 - Uses [OpenSCAD](https://openscad.org/) for 3D modeling
 - Inspired by the need for rapid 3D prototyping
 

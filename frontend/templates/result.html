@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generation Complete - Solidifai</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .status {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .status.success {
+            color: #28a745;
+        }
+
+        .status.warning {
+            color: #ffc107;
+        }
+
+        .status-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .description-box {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .download-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .download-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            transition: background-color 0.2s ease;
+        }
+
+        .download-card:hover {
+            background: #e9ecef;
+        }
+
+        .download-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .download-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            text-decoration: none;
+            color: white;
+        }
+
+        .download-btn.disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            width: 100%;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .back-btn:hover {
+            background: #5a6268;
+            text-decoration: none;
+            color: white;
+        }
+
+        .info-box {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .job-id {
+            font-family: monospace;
+            background: #e9ecef;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 600px) {
+            .download-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 Generation Complete!</h1>
+        </div>
+
+        <div class="card">
+            <div class="status {% if result.success %}success{% else %}warning{% endif %}">
+                <div class="status-icon">
+                    {% if result.success %}✅{% else %}⚠️{% endif %}
+                </div>
+                <h2>{{ result.message }}</h2>
+            </div>
+
+            <div class="description-box">
+                <strong>Your request:</strong> "{{ description }}"
+            </div>
+
+            <div class="download-section">
+                <div class="download-card">
+                    <div class="download-icon">📄</div>
+                    <h3>OpenSCAD File</h3>
+                    <p>Editable source code</p>
+                    <br>
+                    {% if result.scad_url %}
+                        <a href="{{ result.scad_url }}" class="download-btn" download>
+                            Download .scad
+                        </a>
+                    {% else %}
+                        <span class="download-btn disabled">Not Available</span>
+                    {% endif %}
+                </div>
+
+                <div class="download-card">
+                    <div class="download-icon">🎯</div>
+                    <h3>STL File</h3>
+                    <p>Ready for 3D printing</p>
+                    <br>
+                    {% if result.stl_url %}
+                        <a href="{{ result.stl_url }}" class="download-btn" download>
+                            Download .stl
+                        </a>
+                    {% else %}
+                        <span class="download-btn disabled">
+                            {% if result.success %}Processing...{% else %}Failed{% endif %}
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if not result.success %}
+            <div class="info-box">
+                <strong>ℹ️ Note:</strong> The STL conversion failed, likely because OpenSCAD is not installed on the server. 
+                You can download the .scad file and open it in OpenSCAD on your computer to export it to STL format manually.
+                <br><br>
+                <a href="https://openscad.org/" target="_blank">Download OpenSCAD →</a>
+            </div>
+            {% endif %}
+
+            <div style="text-align: center; margin-bottom: 1rem;">
+                <small>Job ID: <span class="job-id">{{ result.job_id }}</span></small>
+            </div>
+
+            <a href="/" class="back-btn">
+                ← Generate Another Model
+            </a>
+        </div>
+    </div>
+</body>
+</html>

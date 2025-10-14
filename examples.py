@@ -1,7 +1,7 @@
 """Example usage of the solidifai library."""
 
 import os
-from solidifai import STLGenerator
+from backend.generator import STLGenerator
 
 def main():
     """Run examples of STL generation."""

@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from unittest.mock import MagicMock, patch
 
-from solidifai import STLGenerator
+from backend.generator import STLGenerator
 
 
 class TestSTLGenerator(unittest.TestCase):

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solidifai - AI-Powered STL Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.2rem;
+        }
+
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input[type="text"], 
+        textarea, 
+        select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus, 
+        textarea:focus, 
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .examples {
+            margin-top: 1rem;
+        }
+
+        .examples h3 {
+            color: #555;
+            margin-bottom: 1rem;
+        }
+
+        .example-item {
+            background: #f8f9fa;
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .example-item:hover {
+            background: #e9ecef;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .footer {
+            text-align: center;
+            color: rgba(255,255,255,0.8);
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Solidifai</h1>
+            <p>Generate 3D models from text descriptions using AI</p>
+        </div>
+
+        <div class="card">
+            <form id="generateForm" method="post" action="/generate-form">
+                <div class="form-group">
+                    <label for="description">Describe your 3D object:</label>
+                    <textarea 
+                        id="description" 
+                        name="description" 
+                        placeholder="e.g., a cube with 10mm sides, a phone stand with 60 degree angle, a gear with 12 teeth..."
+                        required
+                    ></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="region_name">AWS Region (optional):</label>
+                    <select id="region_name" name="region_name">
+                        <option value="">Default (us-east-1)</option>
+                        <option value="us-east-1">US East (N. Virginia)</option>
+                        <option value="us-west-2">US West (Oregon)</option>
+                        <option value="eu-west-1">Europe (Ireland)</option>
+                        <option value="ap-southeast-1">Asia Pacific (Singapore)</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn" id="generateBtn">
+                    🚀 Generate STL File
+                </button>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Generating your 3D model... This may take a few moments.</p>
+                </div>
+            </form>
+        </div>
+
+        <div class="card examples">
+            <h3>💡 Example Descriptions</h3>
+            <div class="example-item" onclick="setExample('a simple cube with 20mm sides')">
+                📦 A simple cube with 20mm sides
+            </div>
+            <div class="example-item" onclick="setExample('a cylinder with diameter 30mm and height 40mm')">
+                🥫 A cylinder with diameter 30mm and height 40mm
+            </div>
+            <div class="example-item" onclick="setExample('a phone stand with 60 degree viewing angle')">
+                📱 A phone stand with 60 degree viewing angle
+            </div>
+            <div class="example-item" onclick="setExample('a gear with 12 teeth and 25mm outer diameter')">
+                ⚙️ A gear with 12 teeth and 25mm outer diameter
+            </div>
+            <div class="example-item" onclick="setExample('an L-shaped bracket with 40mm legs and 3mm thickness')">
+                🔧 An L-shaped bracket with 40mm legs and 3mm thickness
+            </div>
+            <div class="example-item" onclick="setExample('a cable organizer with 5 parallel slots')">
+                🔌 A cable organizer with 5 parallel slots
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Powered by AWS Bedrock • Made with ❤️ for makers</p>
+        </div>
+    </div>
+
+    <script>
+        function setExample(text) {
+            document.getElementById('description').value = text;
+        }
+
+        document.getElementById('generateForm').addEventListener('submit', function() {
+            const btn = document.getElementById('generateBtn');
+            const loading = document.getElementById('loading');
+            
+            btn.disabled = true;
+            btn.textContent = 'Generating...';
+            loading.style.display = 'block';
+        });
+    </script>
+</body>
+</html>
