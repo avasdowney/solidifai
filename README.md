@@ -1,63 +1,43 @@
-# solidifai
+# solidifAI
 
-Generate STL files from plain text descriptions using AI.
+Generate 3D-printable STL files from plain text descriptions using AI (Claude via AWS Bedrock).
 
-## Overview
+## Quick Start
 
-`solidifai` is a Python web application that uses generative AI (AWS Bedrock with Claude) to create 3D printable STL files from natural language descriptions. Simply describe what you want to create through the web interface, and solidifai will generate the necessary OpenSCAD code and convert it to an STL file.
-
-## Features
-
-- 🤖 **AI-Powered Generation**: Uses AWS Bedrock with Claude to understand natural language descriptions
-- 📐 **OpenSCAD Integration**: Generates parametric OpenSCAD code for precise 3D modeling
-- 🖨️ **STL Export**: Automatically converts to STL format for 3D printing
-- � **Web Interface**: Beautiful, responsive web interface for easy usage
-- 💾 **Intermediate Files**: Saves OpenSCAD code for manual tweaking if needed
-- 📁 **File Downloads**: Direct download links for both .scad and .stl files
-
-## Prerequisites
-
-1. **Python 3.8+**
-2. **AWS Account and Credentials**: Configure AWS credentials with access to Bedrock
-3. **OpenSCAD** (optional but recommended): Download from [openscad.org](https://openscad.org/)
-   - Without OpenSCAD, the tool will generate `.scad` files that you can open manually
-
-## Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/avasdowney/solidifai.git
-cd solidifai
-
-# Install the package
-pip install -e .
-```
-
-## Configuration
-
-Configure your AWS credentials using one of these methods:
-
-### Option 1: AWS CLI
-```bash
-aws configure
-```
-
-### Option 2: Create a `.env` file
-```
-AWS_ACCESS_KEY_ID=your-access-key
-AWS_SECRET_ACCESS_KEY=your-secret-key
-AWS_DEFAULT_REGION=us-east-1
-```
-
-## Usage
-
-1. **Start the web server:**
+1. **Install dependencies:**
    ```bash
-   python run_web.py
+   pip install -r requirements.txt
    ```
+2. **Configure AWS credentials:**
+   - Use `aws configure` or create a `.env` file:
+     ```
+     AWS_ACCESS_KEY_ID=your-access-key
+     AWS_SECRET_ACCESS_KEY=your-secret-key
+     AWS_DEFAULT_REGION=us-east-1
+     ```
+3. **(Optional) Install OpenSCAD:**
+   - For automatic STL conversion: [openscad.org](https://openscad.org/)
 
-2. **Open your browser:**
-   Navigate to http://localhost:8000
+## Run the App
+
+```bash
+python run_web.py
+```
+
+Then open [http://localhost:8000](http://localhost:8000) in your browser.
+
+## What It Does
+
+- Enter a description of a 3D object in the web UI
+- The app uses Claude (via AWS Bedrock) to generate OpenSCAD code
+- The code is converted to an STL file for 3D printing
+- Download both `.scad` and `.stl` files from the browser
+
+## Requirements
+
+- Python 3.8+
+- AWS account with Bedrock access
+- OpenSCAD (optional, for STL conversion)
 
 3. **Generate models:**
    - Enter a description like "a simple cube with 10mm sides"
@@ -153,21 +133,6 @@ Contributions are welcome! Feel free to:
 ## License
 
 This project is open source. Feel free to use and modify as needed.
-
-## Acknowledgments
-
-- Built with [AWS Bedrock](https://aws.amazon.com/bedrock/) and [Anthropic's Claude](https://www.anthropic.com/)
-- Uses [OpenSCAD](https://openscad.org/) for 3D modeling
-- Inspired by the need for rapid 3D prototyping
-
-## Roadmap
-
-- [ ] Support for multiple AI models
-- [ ] Web interface
-- [ ] Gallery of generated models
-- [ ] Direct 3D preview in terminal
-- [ ] Batch generation from multiple descriptions
-- [ ] Fine-tuning for specific types of objects
 
 ---
 

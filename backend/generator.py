@@ -1,23 +1,9 @@
-
-"""Backend generator: convert plaintext description -> OpenSCAD -> STL using AWS Bedrock.
-
-Exports:
-- generate(description, output_path, region_name=None, model_id=None) -> bool
-- STLGenerator class with instance method generate(description, output_path)
-
-Notes:
-- Uses boto3 Bedrock runtime client and targets amazon.nova-lite-v1:0 by default.
-- Loads environment variables from a local `.env` via python-dotenv when available.
-"""
-
 import json
 import os
 import subprocess
-import tempfile
 from typing import Optional
 
 import boto3
-
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -32,12 +18,19 @@ class STLGenerator:
     - generate(description: str, output_path: str) -> bool
     """
 
-    def __init__(self, region_name: Optional[str] = None, model_id: Optional[str] = None):
+    def __init__(
+        self, region_name: Optional[str] = None,
+        model_id: Optional[str] = None
+    ):
         self.region_name = region_name or os.getenv("AWS_DEFAULT_REGION", "us-east-1")
         self.model_id = model_id or DEFAULT_MODEL
         self.client = boto3.client("bedrock-runtime", region_name=self.region_name)
 
-    def generate_openscad_code(self, description: str, max_tokens: int = 1500, temperature: float = 0.7) -> str:
+    def generate_openscad_code(
+        self, description: str,
+        max_tokens: int = 1500,
+        temperature: float = 0.7
+    ) -> str:
         """Generate OpenSCAD source for the provided description.
 
         Returns the OpenSCAD source string or raises RuntimeError on failure.
