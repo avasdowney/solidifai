@@ -21,7 +21,7 @@ Generate 3D-printable STL files from plain text descriptions using AI (Claude vi
 ## Run the App
 
 ```bash
-python run_web.py
+python solidifai.py
 ```
 
 Then open [http://localhost:8000](http://localhost:8000) in your browser.

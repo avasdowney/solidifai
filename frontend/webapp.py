@@ -2,19 +2,18 @@
 
 import uuid
 from pathlib import Path
-from typing import Optional
 
 from fastapi import FastAPI, Form, HTTPException, Request
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel
 
 import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
 from backend.generator import STLGenerator
+from .models import GenerationRequest, FileInfo, GenerationResponse
 
 
 # Initialize FastAPI app
@@ -26,42 +25,16 @@ app = FastAPI(
 
 # Create directories for templates and generated files
 TEMPLATE_DIR = Path(__file__).parent / "templates"
-STATIC_DIR = Path(__file__).parent / "static"
 OUTPUT_DIR = Path(__file__).parent / "generated"
 
 TEMPLATE_DIR.mkdir(exist_ok=True)
-STATIC_DIR.mkdir(exist_ok=True)
 OUTPUT_DIR.mkdir(exist_ok=True)
 
 # Mount static files
-app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 app.mount("/generated", StaticFiles(directory=str(OUTPUT_DIR)), name="generated")
 
 # Initialize templates
 templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
-
-
-class GenerationRequest(BaseModel):
-    """Request model for STL generation."""
-    description: str
-    region_name: Optional[str] = None
-
-
-class FileInfo(BaseModel):
-    """Information about a generated file."""
-    filename: str
-    url: str
-    type: str  # 'scad' or 'stl'
-    description: str
-    size_bytes: Optional[int] = None
-
-
-class GenerationResponse(BaseModel):
-    """Response model for STL generation."""
-    success: bool
-    message: str
-    files: list[FileInfo] = []
-    job_id: str
 
 
 @app.get("/", response_class=HTMLResponse)
