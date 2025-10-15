@@ -183,37 +183,30 @@
                 <strong>Your request:</strong> "{{ description }}"
             </div>
 
+            {% if result.files %}
             <div class="download-section">
+                {% for file in result.files %}
                 <div class="download-card">
-                    <div class="download-icon">📄</div>
-                    <h3>OpenSCAD File</h3>
-                    <p>Editable source code</p>
-                    <br>
-                    {% if result.scad_url %}
-                        <a href="{{ result.scad_url }}" class="download-btn" download>
-                            Download .scad
-                        </a>
-                    {% else %}
-                        <span class="download-btn disabled">Not Available</span>
-                    {% endif %}
+                    <div class="download-icon">
+                        {% if file.type == 'scad' %}📄{% else %}🎯{% endif %}
+                    </div>
+                    <h3>
+                        {% if file.type == 'scad' %}OpenSCAD File{% else %}STL File{% endif %}
+                    </h3>
+                    <p>{{ file.description }}</p>
+                    <small style="color: #666;">{{ file.filename }} ({{ (file.size_bytes / 1024) | round(2) }} KB)</small>
+                    <br><br>
+                    <a href="{{ file.url }}" class="download-btn" download>
+                        Download .{{ file.type }}
+                    </a>
                 </div>
-
-                <div class="download-card">
-                    <div class="download-icon">🎯</div>
-                    <h3>STL File</h3>
-                    <p>Ready for 3D printing</p>
-                    <br>
-                    {% if result.stl_url %}
-                        <a href="{{ result.stl_url }}" class="download-btn" download>
-                            Download .stl
-                        </a>
-                    {% else %}
-                        <span class="download-btn disabled">
-                            {% if result.success %}Processing...{% else %}Failed{% endif %}
-                        </span>
-                    {% endif %}
-                </div>
+                {% endfor %}
             </div>
+            {% else %}
+            <div class="info-box" style="background: #f8d7da; border-color: #f5c6cb; color: #721c24;">
+                <strong>⚠️ Error:</strong> No files were generated. Please try again or check the server logs.
+            </div>
+            {% endif %}
 
             {% if not result.success %}
             <div class="info-box">

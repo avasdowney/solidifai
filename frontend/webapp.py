@@ -47,12 +47,20 @@ class GenerationRequest(BaseModel):
     region_name: Optional[str] = None
 
 
+class FileInfo(BaseModel):
+    """Information about a generated file."""
+    filename: str
+    url: str
+    type: str  # 'scad' or 'stl'
+    description: str
+    size_bytes: Optional[int] = None
+
+
 class GenerationResponse(BaseModel):
     """Response model for STL generation."""
     success: bool
     message: str
-    stl_url: Optional[str] = None
-    scad_url: Optional[str] = None
+    files: list[FileInfo] = []
     job_id: str
 
 
@@ -84,19 +92,38 @@ async def generate_stl(request: GenerationRequest):
             output_path=str(stl_path)
         )
         
+        # Collect generated files
+        files = []
+        
+        # Add SCAD file if it exists
+        if scad_path.exists():
+            files.append(FileInfo(
+                filename=scad_filename,
+                url=f"/generated/{scad_filename}",
+                type="scad",
+                description="OpenSCAD source code (editable)",
+                size_bytes=scad_path.stat().st_size
+            ))
+        
+        # Add STL file if it exists
+        if stl_path.exists():
+            files.append(FileInfo(
+                filename=stl_filename,
+                url=f"/generated/{stl_filename}",
+                type="stl",
+                description="STL file (ready for 3D printing)",
+                size_bytes=stl_path.stat().st_size
+            ))
+        
         # Prepare response
-        response = GenerationResponse(
+        message = "Generation completed successfully!" if success else "Generation completed with warnings. STL conversion may have failed, but SCAD file is available."
+        
+        return GenerationResponse(
             success=success,
             job_id=job_id,
-            message="Generation completed successfully!" if success else "Generation completed with warnings. STL conversion may have failed, but SCAD file is available.",
-            scad_url=f"/generated/{scad_filename}"
+            message=message,
+            files=files
         )
-        
-        # Add STL URL if file exists
-        if stl_path.exists():
-            response.stl_url = f"/generated/{stl_filename}"
-        
-        return response
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -1,6 +1,7 @@
-"""Solidifai Backend: Core STL generation logic using AWS Bedrock."""
+import logging
 
-from .generator import STLGenerator
-
-__version__ = "1.0.0"
-__all__ = ["STLGenerator"]
+logging.basicConfig(
+	level=logging.INFO,
+	format='[%(levelname)s] %(asctime)s %(name)s: %(message)s'
+)
+logger = logging.getLogger("solidifai.backend")
